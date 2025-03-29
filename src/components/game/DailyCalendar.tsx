@@ -30,14 +30,14 @@ const DailyCalendar = ({ schedule }: DailyCalendarProps) => {
       </CardHeader>
       <CardContent>
         <div className="space-y-2">
-          {schedule.map((activity, index) => (
+          {timeSlots.map((timeSlot, index) => (
             <div 
               key={index}
               className="flex items-center gap-2"
             >
-              <div className="w-16 text-xs text-gray-300">{timeSlots[index]}</div>
-              <div className={`flex-1 p-2 rounded-md ${getLaneColor(activity)}`}>
-                {activity || "Unplanned"}
+              <div className="w-16 text-xs text-gray-300">{timeSlot}</div>
+              <div className={`flex-1 p-2 rounded-md ${getLaneColor(schedule[index] || "")}`}>
+                {schedule[index] || "Unplanned"}
               </div>
             </div>
           ))}

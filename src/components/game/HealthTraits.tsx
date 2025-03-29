@@ -26,8 +26,11 @@ const HealthTraits = ({ happy, healthy, helpful }: HealthTraitsProps) => {
               <span className="text-sm font-medium">Happy</span>
               <span className="text-sm">{happy.toFixed(1)}/{maxHealth}</span>
             </div>
-            <Progress className="h-2 bg-gray-700" value={happyPercent} 
-              style={{ color: "#D3E4FD" }} // Light Blue
+            <Progress 
+              className="h-2 bg-gray-700" 
+              value={happyPercent} 
+              // Fixed styling to directly apply background color to the indicator
+              style={{ "--progress-foreground": "#D3E4FD" } as React.CSSProperties}
             />
           </div>
           
@@ -36,8 +39,11 @@ const HealthTraits = ({ happy, healthy, helpful }: HealthTraitsProps) => {
               <span className="text-sm font-medium">Healthy</span>
               <span className="text-sm">{healthy.toFixed(1)}/{maxHealth}</span>
             </div>
-            <Progress className="h-2 bg-gray-700" value={healthyPercent}
-              style={{ color: "#F2FCE2" }} // Light Green
+            <Progress 
+              className="h-2 bg-gray-700" 
+              value={healthyPercent}
+              // Fixed styling to directly apply background color to the indicator
+              style={{ "--progress-foreground": "#F2FCE2" } as React.CSSProperties}
             />
           </div>
           
@@ -46,8 +52,11 @@ const HealthTraits = ({ happy, healthy, helpful }: HealthTraitsProps) => {
               <span className="text-sm font-medium">Helpful</span>
               <span className="text-sm">{helpful.toFixed(1)}/{maxHealth}</span>
             </div>
-            <Progress className="h-2 bg-gray-700" value={helpfulPercent}
-              style={{ color: "#E5DEFF" }} // Light Purple
+            <Progress 
+              className="h-2 bg-gray-700" 
+              value={helpfulPercent}
+              // Fixed styling to directly apply background color to the indicator
+              style={{ "--progress-foreground": "#E5DEFF" } as React.CSSProperties}
             />
           </div>
         </div>
