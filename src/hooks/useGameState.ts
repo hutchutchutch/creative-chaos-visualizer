@@ -86,6 +86,12 @@ export const useGameState = () => {
   };
 
   const handleLaneDecision = (laneIdx: number) => {
+    // Only process lane decisions if the game is active
+    if (!gameActive) {
+      console.log('Lane decision ignored - game not active');
+      return;
+    }
+    
     console.log('Lane decision made:', { laneIdx, currentHour });
     
     // Record the choice for the daily schedule
@@ -124,10 +130,12 @@ export const useGameState = () => {
       detail: { score: 1, type: 'add' } 
     }));
 
-    // Also dispatch health update event - ensure we're using the updated health value
-    window.dispatchEvent(new CustomEvent('health-update', {
-      detail: { health }
-    }));
+    // Also dispatch health update event - use a timeout to ensure we get the updated health
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('health-update', {
+        detail: { health }
+      }));
+    }, 10);
   };
 
   return {

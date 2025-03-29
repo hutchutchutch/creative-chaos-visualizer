@@ -86,8 +86,8 @@ const HourChoice = ({ position, laneIndex, onCollide, playerLane, gameSpeed }: H
       }
       
       // Check if object has reached the player
-      // Use a wider collision range to make it easier to hit
-      if (z > -2 && z < 2) {
+      // Use an even wider collision range to make it easier to hit
+      if (z > -3 && z < 3) {
         // In collision range
         if (playerLane === laneIndex && !passed) {
           console.log('Collision detected with hour choice:', { 
@@ -97,12 +97,15 @@ const HourChoice = ({ position, laneIndex, onCollide, playerLane, gameSpeed }: H
             hour 
           });
           setPassed(true);
-          onCollide(laneIndex);
+          // Slight delay to ensure collision doesn't happen before game is active
+          setTimeout(() => {
+            onCollide(laneIndex);
+          }, 10);
         }
       }
       
       // If passed player without collision, mark as passed
-      if (z >= 2 && !passed) {
+      if (z >= 3 && !passed) {
         console.log('Hour choice missed:', { laneIndex, playerLane, z });
         setPassed(true);
       }

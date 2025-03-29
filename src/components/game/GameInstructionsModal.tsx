@@ -24,8 +24,13 @@ const GameInstructionsModal: React.FC<GameInstructionsModalProps> = ({
 }) => {
   const handleStart = () => {
     console.log("🔍 Got it button clicked, calling onStart and onClose...");
-    onStart(); // Start the game
+    // Ensure we close the modal first and then start the game
     onClose(); // Close the modal
+    // Delay starting the game slightly to ensure modal is closed first
+    setTimeout(() => {
+      onStart(); // Start the game after a slight delay
+      console.log("🔍 Starting game after modal close");
+    }, 100);
   };
 
   return (

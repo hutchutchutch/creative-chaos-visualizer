@@ -26,9 +26,12 @@ const Game = () => {
     console.log("🔍 startGame called in Game.tsx, dispatching game-start event...");
     if (!gameStarted) { // Only start the game if it hasn't been started yet
       setGameStarted(true);
-      window.dispatchEvent(new CustomEvent('game-start'));
-      console.log("🔍 game-start event dispatched");
       setGameOver(false);
+      // Dispatch event after state updates
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('game-start'));
+        console.log("🔍 game-start event dispatched after state updates");
+      }, 0);
     } else {
       console.log("🔍 Game already started, skipping duplicate start");
     }
