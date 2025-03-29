@@ -1,5 +1,6 @@
 
 import { useEffect } from 'react';
+import { GAME_SPEED_INITIAL } from '../components/game/constants';
 
 interface GameResetParams {
   setGameActive: (active: boolean) => void;
@@ -63,6 +64,3 @@ export const useGameReset = ({
   
   return { restartGame };
 };
-
-// Import for the hook
-import { GAME_SPEED_INITIAL } from '../components/game/constants';

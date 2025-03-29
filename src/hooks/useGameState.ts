@@ -105,9 +105,9 @@ export const useGameState = () => {
       detail: { score: 1, type: 'add' } 
     }));
 
-    // Also dispatch health update event
+    // Also dispatch health update event - ensure we're using the updated health value
     window.dispatchEvent(new CustomEvent('health-update', {
-      detail: { health }
+      detail: { health: newHealth }
     }));
   };
 

@@ -1,5 +1,5 @@
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 
 // Import our extracted components
@@ -14,6 +14,7 @@ import Lighting from './game/Lighting';
 import { useGameState } from '../hooks/useGameState';
 import { useHourChoices } from '../hooks/useHourChoices';
 import { usePlayerControls } from '../hooks/usePlayerControls';
+import { useGameReset } from '../hooks/useGameReset';
 
 const GameScene = () => {
   const { camera } = useThree();
@@ -32,12 +33,28 @@ const GameScene = () => {
   } = useGameState();
   
   // Hour choices management
-  const { hourChoices, updateHourChoices, updateFrame } = useHourChoices(gameSpeed, gameActive);
+  const { hourChoices, updateHourChoices, updateFrame, setHourChoices } = useHourChoices(gameSpeed, gameActive);
   
   // Player controls with enhanced movement feedback
   const { getPlayerPosition, isMoving, moveDirection } = usePlayerControls(playerLane, setPlayerLane, gameActive);
   
+  // Reset functionality
+  const resetFrameCounters = useCallback(() => {
+    frameCounter.current = 0;
+  }, []);
+  
+  useGameReset({
+    setGameActive,
+    setCurrentHour,
+    setHealth,
+    setHourChoices,
+    setGameSpeed,
+    setDailySchedule,
+    resetFrameCounters
+  });
+  
   // Main game loop
+  const frameCounter = useRef(0);
   useFrame(() => {
     if (!gameActive) return;
     
@@ -45,8 +62,11 @@ const GameScene = () => {
     const targetX = getPlayerPosition();
     camera.position.x += (targetX - camera.position.x) * 0.1;
     
-    // Update game speed
-    updateGameSpeed();
+    // Update game speed less frequently (every 60 frames)
+    frameCounter.current += 1;
+    if (frameCounter.current % 60 === 0) {
+      updateGameSpeed();
+    }
     
     // Update existing hour choices (move them)
     updateHourChoices();

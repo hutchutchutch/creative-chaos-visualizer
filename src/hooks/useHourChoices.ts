@@ -64,15 +64,20 @@ export const useHourChoices = (gameSpeed: number, gameActive: boolean) => {
       const newChoicePosition = new THREE.Vector3(
         LANES[lane],
         0.5, // Position slightly above ground
-        -20 // Start closer to player for better visibility
+        -30 // Start farther from player for more reaction time
       );
       
-      setHourChoices(prev => [
-        ...prev, 
-        {position: newChoicePosition, lane, id: newId}
-      ]);
-      
-      console.log('Spawned new hour choice:', { lane, id: newId, position: newChoicePosition });
+      // Ensure we're not creating too many choices
+      if (hourChoices.length < 10) {
+        setHourChoices(prev => [
+          ...prev, 
+          {position: newChoicePosition, lane, id: newId}
+        ]);
+        
+        console.log('Spawned new hour choice:', { lane, id: newId, position: newChoicePosition });
+      } else {
+        console.log('Too many hour choices, skipping spawn');
+      }
       
       // Reset counter and set next choice time
       frameCount.current = 0;
@@ -88,6 +93,7 @@ export const useHourChoices = (gameSpeed: number, gameActive: boolean) => {
   return {
     hourChoices,
     updateHourChoices,
-    updateFrame
+    updateFrame,
+    setHourChoices
   };
 };

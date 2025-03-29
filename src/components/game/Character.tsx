@@ -4,9 +4,11 @@ import * as THREE from 'three';
 
 interface CharacterProps {
   position: [number, number, number];
+  isMoving?: boolean;
+  moveDirection?: 'left' | 'right' | null;
 }
 
-const Character = ({ position }: CharacterProps) => {
+const Character = ({ position, isMoving = false, moveDirection = null }: CharacterProps) => {
   const meshRef = useRef<THREE.Group>(null);
   
   // For debugging
@@ -18,9 +20,9 @@ const Character = ({ position }: CharacterProps) => {
   useEffect(() => {
     if (meshRef.current) {
       meshRef.current.position.set(position[0], position[1], position[2]);
-      console.log('Character position updated to:', position);
+      console.log('Character position updated to:', position, 'isMoving:', isMoving, 'direction:', moveDirection);
     }
-  }, [position]);
+  }, [position, isMoving, moveDirection]);
   
   return (
     <group ref={meshRef} position={position}>
