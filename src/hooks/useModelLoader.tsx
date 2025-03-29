@@ -1,54 +1,60 @@
 
-import { useLoader } from '@react-three/fiber';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import { useState, useEffect } from 'react';
+import * as THREE from 'three';
+import { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+
+export interface ModelData {
+  scene: THREE.Group | null;
+  animations?: THREE.AnimationClip[];
+}
 
 export const useModelLoader = (modelPath: string) => {
   const [loadingProgress, setLoadingProgress] = useState(0);
-
-  // Set up DRACO loader for compression
-  const dracoLoader = new DRACOLoader();
-  dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
-
-  // Set up GLTF loader with DRACO support
-  const gltfLoader = new GLTFLoader();
-  gltfLoader.setDRACOLoader(dracoLoader);
-
-  // Instead of using the useLoader directly, we'll simulate it with a placeholder
-  // In a real implementation, you would replace this with actual model loading
-  // For now we'll create a loading simulation until the real model is available
-  
-  const [model, setModel] = useState<any>(null);
+  const [model, setModel] = useState<ModelData | null>(null);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     let isMounted = true;
     
-    // Simulate loading progress
-    const interval = setInterval(() => {
-      setLoadingProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          return 100;
-        }
-        return prev + 1;
-      });
-    }, 50);
+    // Set up DRACO loader for compression
+    const dracoLoader = new DRACOLoader();
+    dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
 
-    // Simulate model loading completion
-    setTimeout(() => {
-      if (isMounted) {
-        // This would be replaced with real model data
-        setModel({ scene: null });
-        clearInterval(interval);
-        setLoadingProgress(100);
+    // Set up GLTF loader with DRACO support
+    const gltfLoader = new GLTFLoader();
+    gltfLoader.setDRACOLoader(dracoLoader);
+
+    // Load the model
+    gltfLoader.load(
+      modelPath,
+      (gltf: GLTF) => {
+        if (isMounted) {
+          setModel({
+            scene: gltf.scene,
+            animations: gltf.animations
+          });
+          setLoadingProgress(100);
+        }
+      },
+      (progress) => {
+        if (isMounted) {
+          const percentage = (progress.loaded / progress.total) * 100;
+          setLoadingProgress(Math.min(percentage, 99)); // Cap at 99% until fully loaded
+        }
+      },
+      (err) => {
+        if (isMounted) {
+          console.error('Error loading model:', err);
+          setError(err);
+        }
       }
-    }, 5000);
+    );
 
     return () => {
       isMounted = false;
-      clearInterval(interval);
+      dracoLoader.dispose();
     };
   }, [modelPath]);
 

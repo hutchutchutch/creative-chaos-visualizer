@@ -11,9 +11,9 @@ interface CreativeChaosCanvasProps {
 }
 
 const CreativeChaosCanvas: React.FC<CreativeChaosCanvasProps> = ({ 
-  modelPath = '/models/desk-scene.glb' // This will be replaced with your actual model path
+  modelPath = '/desk.glb' // Using the desk.glb file from the public folder
 }) => {
-  const { loadingProgress } = useModelLoader(modelPath);
+  const { model, loadingProgress, error } = useModelLoader(modelPath);
   const [showOverlay, setShowOverlay] = useState(false);
   
   // Show UI overlay after loading completes
@@ -27,6 +27,13 @@ const CreativeChaosCanvas: React.FC<CreativeChaosCanvasProps> = ({
     }
   }, [loadingProgress]);
   
+  // Log any errors
+  useEffect(() => {
+    if (error) {
+      console.error("Error loading model:", error);
+    }
+  }, [error]);
+
   return (
     <>
       {/* Show loading screen while model loads */}
@@ -47,7 +54,7 @@ const CreativeChaosCanvas: React.FC<CreativeChaosCanvasProps> = ({
         style={{ background: '#1A1F2C' }}
       >
         <Suspense fallback={null}>
-          <DeskScene />
+          <DeskScene modelData={model} />
         </Suspense>
       </Canvas>
       
