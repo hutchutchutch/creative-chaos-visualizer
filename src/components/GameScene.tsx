@@ -26,10 +26,14 @@ const GameScene = () => {
     gameSpeed,
     health,
     gameActive,
+    setGameActive,
     currentHour,
+    setCurrentHour,
     dailySchedule,
+    setDailySchedule,
     updateGameSpeed,
-    handleLaneDecision
+    handleLaneDecision,
+    setHealth
   } = useGameState();
   
   // Hour choices management

@@ -107,7 +107,7 @@ export const useGameState = () => {
 
     // Also dispatch health update event - ensure we're using the updated health value
     window.dispatchEvent(new CustomEvent('health-update', {
-      detail: { health: newHealth }
+      detail: { health }
     }));
   };
 
@@ -115,10 +115,15 @@ export const useGameState = () => {
     playerLane,
     setPlayerLane,
     gameSpeed,
+    setGameSpeed,
     health,
+    setHealth,
     gameActive,
+    setGameActive,
     currentHour,
+    setCurrentHour,
     dailySchedule,
+    setDailySchedule,
     updateGameSpeed,
     handleLaneDecision
   };
