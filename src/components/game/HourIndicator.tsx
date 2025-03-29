@@ -9,16 +9,16 @@ interface HourIndicatorProps {
 
 const HourIndicator = ({ currentHour, totalHours = 16 }: HourIndicatorProps) => {
   return (
-    <group>
+    <group position={[0, 3.5, -5]}>
       {/* Background plane for better visibility */}
-      <mesh position={[0, 3.5, -5.01]}>
+      <mesh position={[0, 0, -0.1]}>
         <planeGeometry args={[6, 1.5]} />
         <meshBasicMaterial color="#000000" opacity={0.85} transparent />
       </mesh>
       
       {/* Text indicator */}
       <Text 
-        position={[0, 3.5, -5]}
+        position={[0, 0, 0]}
         fontSize={1.2}
         color="#FFFFFF"
         anchorX="center"

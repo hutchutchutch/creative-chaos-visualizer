@@ -12,15 +12,6 @@ const Character = ({ position }: CharacterProps) => {
   // For debugging
   useEffect(() => {
     console.log('Character initialized at position:', position);
-    
-    // Add position update check
-    const intervalId = setInterval(() => {
-      if (meshRef.current) {
-        console.log('Character current position:', meshRef.current.position);
-      }
-    }, 5000); // Log every 5 seconds
-    
-    return () => clearInterval(intervalId);
   }, [position]);
   
   // Update position whenever it changes
@@ -55,8 +46,8 @@ const Character = ({ position }: CharacterProps) => {
         <meshStandardMaterial color="#8B5CF6" emissive="#8B5CF6" emissiveIntensity={0.3} />
       </mesh>
       
-      {/* Add a stronger light source to character to make it more visible */}
-      <pointLight position={[0, 1, 0]} intensity={2} distance={5} color="#FFFFFF" />
+      {/* Add a spotlight to make character more visible */}
+      <pointLight position={[0, 1, 0]} intensity={5} distance={3} color="#FFFFFF" />
     </group>
   );
 };

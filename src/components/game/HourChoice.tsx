@@ -19,6 +19,7 @@ const HourChoice = ({ position, laneIndex, onCollide, playerLane, gameSpeed }: H
   const meshRef = useRef<THREE.Mesh>(null);
   const [passed, setPassed] = useState(false);
   const [hour] = useState(Math.floor(Math.random() * 12) + 1);
+  const initialZ = position[2];
   
   // For debugging
   useEffect(() => {
@@ -37,23 +38,34 @@ const HourChoice = ({ position, laneIndex, onCollide, playerLane, gameSpeed }: H
   
   useFrame(() => {
     if (meshRef.current && !passed) {
-      // Get current position
-      const z = meshRef.current.position.z;
-      
       // Move object toward player (positive Z direction)
-      meshRef.current.position.z += gameSpeed * 2;
+      meshRef.current.position.z += gameSpeed;
       
       // Add a slight rotation for visual effect
       meshRef.current.rotation.y += 0.01;
       
-      // Check if object has passed the player
-      if (z > 0 && z < 5) {
+      // Get current position
+      const z = meshRef.current.position.z;
+      
+      // Debug log every 30 frames to track movement
+      if (Math.floor(z * 10) % 30 === 0) {
+        console.log('Hour choice moving:', { 
+          laneIndex, 
+          z,
+          playerLane,
+          distance: z - position[2],
+          gameSpeed
+        });
+      }
+      
+      // Check if object has reached the player
+      if (z > -1 && z < 1) {
         // In collision range
         if (playerLane === laneIndex && !passed) {
           console.log('Collision detected with hour choice:', { 
             laneIndex, 
             playerLane, 
-            z: meshRef.current.position.z,
+            z,
             hour 
           });
           setPassed(true);
@@ -62,7 +74,7 @@ const HourChoice = ({ position, laneIndex, onCollide, playerLane, gameSpeed }: H
       }
       
       // If passed player without collision, mark as passed
-      if (z >= 5 && !passed) {
+      if (z >= 1 && !passed) {
         console.log('Hour choice missed:', { laneIndex, playerLane, z });
         setPassed(true);
       }
@@ -93,5 +105,4 @@ const HourChoice = ({ position, laneIndex, onCollide, playerLane, gameSpeed }: H
   );
 };
 
-// Export LANE_WIDTH for use in this component
 export default HourChoice;

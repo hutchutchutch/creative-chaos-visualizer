@@ -12,7 +12,7 @@ export const LANE_COLORS = {
 export const LANE_TITLES = ["Happy", "Healthy", "Helpful"];
 
 // Game constants
-export const GAME_SPEED_INITIAL = 0.5;  // Significantly increased for better gameplay
+export const GAME_SPEED_INITIAL = 0.2;  // Lower initial speed
 export const GAME_SPEED_INCREMENT = 0.0001;
-export const OBSTACLE_INTERVAL_MIN = 20; // Further reduced to spawn more frequently
-export const OBSTACLE_INTERVAL_MAX = 40; // Further reduced to spawn more frequently
+export const OBSTACLE_INTERVAL_MIN = 60; // Longer intervals between obstacles
+export const OBSTACLE_INTERVAL_MAX = 120; // Longer intervals between obstacles

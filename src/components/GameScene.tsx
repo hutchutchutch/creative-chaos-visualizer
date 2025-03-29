@@ -39,7 +39,7 @@ const GameScene = () => {
   const frameCount = useRef(0);
   const choiceIdCounter = useRef(0);
   
-  // Debug info
+  // Debug info - log important game state every few seconds
   useEffect(() => {
     console.log('GameScene initialized with:', { 
       playerLane, 
@@ -49,7 +49,20 @@ const GameScene = () => {
       gameActive, 
       currentHour 
     });
-  }, []);
+    
+    const debugInterval = setInterval(() => {
+      console.log('Game state:', {
+        playerLane,
+        gameSpeed,
+        frameCount: frameCount.current,
+        nextChoice: nextChoiceTime.current,
+        hourChoices: hourChoices.length,
+        currentHour
+      });
+    }, 5000);
+    
+    return () => clearInterval(debugInterval);
+  }, [playerLane, gameSpeed, hourChoices.length, currentHour]);
   
   // Handle health updates for lane decision
   const handleLaneDecision = (laneIdx: number) => {
@@ -160,7 +173,6 @@ const GameScene = () => {
   
   // Function to update hour choices positions
   const updateHourChoices = useCallback(() => {
-    console.log('Updating hour choices, count:', hourChoices.length, 'game speed:', gameSpeed);
     setHourChoices(prev => {
       return prev
         .map(choice => {
@@ -168,14 +180,14 @@ const GameScene = () => {
           const newPosition = new THREE.Vector3(
             choice.position.x,
             choice.position.y,
-            choice.position.z + gameSpeed * 2
+            choice.position.z + gameSpeed
           );
           
           return { ...choice, position: newPosition };
         })
         .filter(choice => choice.position.z < 10); // Remove if too far past the player
     });
-  }, [gameSpeed, hourChoices.length]);
+  }, [gameSpeed]);
   
   // Main game loop
   useFrame(() => {
@@ -194,11 +206,12 @@ const GameScene = () => {
     // Update existing hour choices (move them)
     updateHourChoices();
     
-    // Debug every 60 frames
-    if (frameCount.current % 60 === 0) {
+    // Debug log every 100 frames
+    if (frameCount.current % 100 === 0) {
       console.log('Game loop - Frame:', frameCount.current, 
         'Next choice in:', nextChoiceTime.current - frameCount.current,
-        'Hour choices:', hourChoices.length);
+        'Hour choices:', hourChoices.length,
+        'Game speed:', gameSpeed);
     }
     
     // Spawn new hour choice objects
@@ -210,7 +223,7 @@ const GameScene = () => {
       const newChoicePosition = new THREE.Vector3(
         LANES[lane],
         0.5, // Position slightly above ground
-        -50 // Far ahead
+        -20 // Start closer to player for better visibility
       );
       
       setHourChoices(prev => [
@@ -218,7 +231,7 @@ const GameScene = () => {
         {position: newChoicePosition, lane, id: newId}
       ]);
       
-      console.log('Spawned new hour choice:', { lane, id: newId, z: -50 });
+      console.log('Spawned new hour choice:', { lane, id: newId, position: newChoicePosition });
       
       // Reset counter and set next choice time
       frameCount.current = 0;

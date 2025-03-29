@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
@@ -19,7 +18,6 @@ const Game = () => {
   const [schedule, setSchedule] = useState<string[]>(Array(16).fill(''));
   const navigate = useNavigate();
 
-  // Handle key presses for game controls
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowLeft') {
@@ -31,7 +29,6 @@ const Game = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     
-    // Listen for score updates
     const handleScoreUpdate = (e: CustomEvent) => {
       if (e.detail.type === 'set') {
         setScore(e.detail.score);
@@ -40,19 +37,16 @@ const Game = () => {
       }
     };
     
-    // Listen for health updates
     const handleHealthUpdate = (e: CustomEvent) => {
       if (e.detail.health) {
         setHealth(e.detail.health);
       }
     };
     
-    // Listen for game over event
     const handleGameOver = () => {
       setGameOver(true);
     };
     
-    // Listen for choices and schedule data
     const handleChoicesUpdate = (e: CustomEvent) => {
       if (e.detail.health) {
         setHealth(e.detail.health);
@@ -94,7 +88,6 @@ const Game = () => {
 
   return (
     <div className="relative w-full h-screen bg-creative-dark overflow-hidden">
-      {/* Game Canvas */}
       <Canvas
         shadows
         camera={{ position: [0, 2, 5], fov: 60 }}
@@ -103,22 +96,19 @@ const Game = () => {
         <GameScene />
       </Canvas>
 
-      {/* Game HUD */}
       <div className="absolute top-0 left-0 w-full p-4 text-white flex justify-between items-center">
         <Button 
-          variant="outline" 
+          variant="secondary" 
           onClick={handleBackToHome} 
-          className="bg-black/50 text-white border-white hover:bg-black/80"
+          className="bg-white text-black hover:bg-gray-200 font-bold"
         >
           Back to Home
         </Button>
         <div className="text-2xl font-bold">Hours Planned: {score}/16</div>
       </div>
 
-      {/* Health Traits */}
       {!gameOver && <HealthTraits happy={health.happy} healthy={health.healthy} helpful={health.helpful} />}
 
-      {/* Mobile Controls */}
       <div className="md:hidden absolute bottom-10 left-0 w-full flex justify-center gap-10">
         <Button 
           className="h-16 w-16 rounded-full bg-creative-purple/80 hover:bg-creative-purple"
@@ -134,7 +124,6 @@ const Game = () => {
         </Button>
       </div>
 
-      {/* Game Over Overlay */}
       {gameOver && (
         <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center">
           <div className="bg-creative-dark p-8 rounded-lg text-center max-w-xl w-full">
