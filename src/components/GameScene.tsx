@@ -199,6 +199,25 @@ const GameScene = () => {
   const { scene } = useGLTF('/desk3.glb');
   const deskRef = useRef<THREE.Group>(null);
   
+  // Handle score updates for lane decision - Define the handleLaneDecision function here
+  const handleLaneDecision = (laneIdx: number) => {
+    if (laneIdx === 0) {
+      setChoices(prev => ({...prev, happy: prev.happy + 1}));
+    } else if (laneIdx === 1) {
+      setChoices(prev => ({...prev, healthy: prev.healthy + 1}));
+    } else if (laneIdx === 2) {
+      setChoices(prev => ({...prev, helpful: prev.helpful + 1}));
+    }
+    
+    // Advance to next hour
+    setCurrentHour(prev => prev + 1);
+    
+    // Update score to track total decisions made
+    window.dispatchEvent(new CustomEvent('score-update', { 
+      detail: { score: 1, type: 'add' } 
+    }));
+  };
+  
   useEffect(() => {
     if (scene && deskRef.current) {
       // Clone and add the desk model
@@ -218,25 +237,6 @@ const GameScene = () => {
       } else if (e.detail.direction === 'right' && playerLane < 2) {
         setPlayerLane(prev => prev + 1);
       }
-    };
-    
-    // Handle score updates for lane decision
-    const handleLaneDecision = (laneIdx: number) => {
-      if (laneIdx === 0) {
-        setChoices(prev => ({...prev, happy: prev.happy + 1}));
-      } else if (laneIdx === 1) {
-        setChoices(prev => ({...prev, healthy: prev.healthy + 1}));
-      } else if (laneIdx === 2) {
-        setChoices(prev => ({...prev, helpful: prev.helpful + 1}));
-      }
-      
-      // Advance to next hour
-      setCurrentHour(prev => prev + 1);
-      
-      // Update score to track total decisions made
-      window.dispatchEvent(new CustomEvent('score-update', { 
-        detail: { score: 1, type: 'add' } 
-      }));
     };
     
     // Handle game restart
