@@ -5,16 +5,18 @@ import { useModelLoader } from '../hooks/useModelLoader';
 import DeskScene from './DeskScene';
 import LoadingScreen from './LoadingScreen';
 import UIOverlay from './UIOverlay';
+import { useNavigate } from 'react-router-dom';
 
 interface CreativeChaosCanvasProps {
   modelPath?: string;
 }
 
 const CreativeChaosCanvas: React.FC<CreativeChaosCanvasProps> = ({ 
-  modelPath = '/desk2.glb' // Changed to use desk2.glb file
+  modelPath = '/desk3.glb' // Changed to use desk3.glb file
 }) => {
   const { model, loadingProgress, error } = useModelLoader(modelPath);
   const [showOverlay, setShowOverlay] = useState(false);
+  const navigate = useNavigate();
   
   // Show UI overlay after loading completes
   useEffect(() => {
@@ -33,6 +35,10 @@ const CreativeChaosCanvas: React.FC<CreativeChaosCanvasProps> = ({
       console.error("Error loading model:", error);
     }
   }, [error]);
+
+  const handleCtaClick = () => {
+    navigate('/game');
+  };
 
   return (
     <>
@@ -58,8 +64,8 @@ const CreativeChaosCanvas: React.FC<CreativeChaosCanvasProps> = ({
         </Suspense>
       </Canvas>
       
-      {/* UI Overlay */}
-      {showOverlay && <UIOverlay />}
+      {/* UI Overlay with navigation handler */}
+      {showOverlay && <UIOverlay onCtaClick={handleCtaClick} />}
     </>
   );
 };
