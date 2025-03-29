@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { GAME_SPEED_INITIAL, GAME_SPEED_INCREMENT } from '../components/game/constants';
 
 export interface GameState {
@@ -30,21 +30,64 @@ export const useGameState = () => {
   // Add an effect to log when gameActive changes
   useEffect(() => {
     console.log("🔍 useGameState: gameActive changed to:", gameActive);
+    
+    // If gameActive is true, dispatch a notification
+    if (gameActive) {
+      console.log("🔍 useGameState: Game is now active, dispatching game-active-changed event");
+      window.dispatchEvent(new CustomEvent('game-active-changed', { detail: { active: true } }));
+    }
   }, [gameActive]);
   
-  // Listen for game-start event
+  // Listen for game-start event - IMPORTANT: Remove gameActive from dependency array
   useEffect(() => {
+    console.log("🔍 SETUP: Setting up game-start event listener in useGameState");
+    
     const handleGameStart = () => {
-      console.log("🔍 useGameState: Received game-start event, setting gameActive to true");
+      console.log("🔍 HANDLER: useGameState received game-start event, setting gameActive to true");
+      console.log("🔍 HANDLER: gameActive before:", gameActive);
+      
+      // Try to directly set gameActive to true
+      setGameActive(true);
+      console.log("🔍 HANDLER: Called setGameActive(true)");
+      
+      // Force update gameActive with a direct call to ensure it's set
+      setTimeout(() => {
+        console.log("🔍 HANDLER TIMEOUT: useGameState checking gameActive after timeout:", gameActive);
+        if (!gameActive) {
+          console.log("🔍 HANDLER TIMEOUT: gameActive still false after timeout, forcing update");
+          setGameActive(true);
+          console.log("🔍 HANDLER TIMEOUT: Called setGameActive(true) again");
+        }
+      }, 100);
+    };
+    
+    // Also listen for the force event
+    const handleForceActive = () => {
+      console.log("🔍 FORCE: useGameState received game-active-force event, forcing gameActive to true");
       setGameActive(true);
     };
     
+    console.log("🔍 SETUP: useGameState current gameActive:", gameActive);
     window.addEventListener('game-start', handleGameStart);
+    window.addEventListener('game-active-force', handleForceActive);
+    
+    // Also listen for the test event to verify event handling
+    const handleTestEvent = () => {
+      console.log("🔍 TEST: useGameState test event received, event system is working");
+    };
+    window.addEventListener('test-event', handleTestEvent);
+    
+    // Try dispatching a test event to verify the event system
+    console.log("🔍 SETUP: useGameState dispatching test-event-2");
+    window.dispatchEvent(new CustomEvent('test-event-2'));
     
     return () => {
+      console.log("🔍 CLEANUP: Cleaning up event listeners in useGameState");
       window.removeEventListener('game-start', handleGameStart);
+      window.removeEventListener('game-active-force', handleForceActive);
+      window.removeEventListener('test-event', handleTestEvent);
     };
-  }, []);
+  }, []); // Remove gameActive from dependency array to prevent re-registering the event listener
 
   // Debug info - log important game state every few seconds
   useEffect(() => {
@@ -138,6 +181,43 @@ export const useGameState = () => {
     }, 10);
   };
 
+  // Add a direct method to force the game to start
+  const forceGameStart = useCallback(() => {
+    console.log("🔍 DIRECT: Forcing game to start directly");
+    
+    // Set gameActive to true directly
+    setGameActive(true);
+    
+    // Dispatch a notification that the game has been forced to start
+    window.dispatchEvent(new CustomEvent('game-active-changed', { 
+      detail: { active: true, forced: true } 
+    }));
+    
+    // Log the current state
+    console.log("🔍 DIRECT: Game state after force start:", {
+      gameActive: true,
+      playerLane,
+      gameSpeed,
+      currentHour
+    });
+    
+    // Force a re-render by dispatching a custom event
+    window.dispatchEvent(new CustomEvent('game-active-force', { 
+      detail: { timestamp: Date.now() } 
+    }));
+    
+    // Try again after a short delay to ensure it's set
+    setTimeout(() => {
+      console.log("🔍 DIRECT TIMEOUT: Forcing game to start again");
+      setGameActive(true);
+      
+      // Dispatch another event
+      window.dispatchEvent(new CustomEvent('game-active-force', { 
+        detail: { timestamp: Date.now(), retry: true } 
+      }));
+    }, 100);
+  }, [playerLane, gameSpeed, currentHour]);
+
   return {
     playerLane,
     setPlayerLane,
@@ -152,6 +232,7 @@ export const useGameState = () => {
     dailySchedule,
     setDailySchedule,
     updateGameSpeed,
-    handleLaneDecision
+    handleLaneDecision,
+    forceGameStart // Export the new method
   };
 };

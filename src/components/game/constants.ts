@@ -14,5 +14,5 @@ export const LANE_TITLES = ["Happy", "Healthy", "Helpful"];
 // Game constants
 export const GAME_SPEED_INITIAL = 0.2;  // Initial speed
 export const GAME_SPEED_INCREMENT = 0.001; // Increased increment for more dynamic gameplay
-export const OBSTACLE_INTERVAL_MIN = 40; // Shorter intervals between obstacles
-export const OBSTACLE_INTERVAL_MAX = 80; // Shorter intervals between obstacles
+export const OBSTACLE_INTERVAL_MIN = 10; // Much shorter intervals between obstacles
+export const OBSTACLE_INTERVAL_MAX = 30; // Much shorter intervals between obstacles

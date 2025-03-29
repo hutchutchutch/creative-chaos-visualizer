@@ -5,15 +5,18 @@ import { LANES } from '../components/game/constants';
 export const usePlayerControls = (
   playerLane: number, 
   setPlayerLane: (lane: number) => void,
-  gameActive: boolean
+  gameActive: boolean,
+  forceGameActive?: boolean
 ) => {
+  // Use either gameActive or forceGameActive
+  const isActive = gameActive || forceGameActive;
   const [isMoving, setIsMoving] = useState(false);
   const [moveDirection, setMoveDirection] = useState<'left' | 'right' | null>(null);
   
   useEffect(() => {
     // Handle player movement
     const handleMove = (e: CustomEvent) => {
-      if (!gameActive) return;
+      if (!isActive) return;
       
       const direction = e.detail.direction as 'left' | 'right';
       
@@ -42,7 +45,7 @@ export const usePlayerControls = (
     return () => {
       window.removeEventListener('game-move', handleMove as EventListener);
     };
-  }, [playerLane, gameActive, setPlayerLane]);
+  }, [playerLane, isActive, setPlayerLane]);
 
   // Return player position for camera
   const getPlayerPosition = () => {

@@ -1,7 +1,7 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
-import GameScene from '../components/GameScene';
+import GameScene, { GameSceneHandle } from '../components/GameScene';
 import HealthTraits from '../components/game/HealthTraits';
 import GameControls from '../components/game/GameControls';
 import GameOverlay from '../components/game/GameOverlay';
@@ -21,19 +21,75 @@ const Game = () => {
   const [showInstructions, setShowInstructions] = useState(true);
   const [gameStarted, setGameStarted] = useState(false); // Track if game has been started
   const navigate = useNavigate();
+  
+  // Force the game to start when the component mounts
+  useEffect(() => {
+    console.log("🔍 GAME MOUNT: Component mounted, forcing game to start");
+    // Set a timeout to ensure the component is fully mounted
+    setTimeout(() => {
+      setGameStarted(true);
+      console.log("🔍 GAME MOUNT: Set gameStarted to true");
+    }, 500);
+  }, []);
 
+  // Function to close the instructions modal
+  const closeInstructions = () => {
+    console.log("🔍 closeInstructions called in Game.tsx");
+    setShowInstructions(false);
+  };
+
+  // Get the forceGameStart method from the GameScene component
+  const forceGameStartRef = useRef<GameSceneHandle>(null);
+  
   const startGame = () => {
-    console.log("🔍 startGame called in Game.tsx, dispatching game-start event...");
+    console.log("🔍 GAME: startGame called in Game.tsx, gameStarted:", gameStarted);
+    // Force close the instructions modal first
+    setShowInstructions(false);
+    
     if (!gameStarted) { // Only start the game if it hasn't been started yet
+      console.log("🔍 GAME: Setting gameStarted to true and gameOver to false");
       setGameStarted(true);
       setGameOver(false);
-      // Dispatch event after state updates
-      setTimeout(() => {
-        window.dispatchEvent(new CustomEvent('game-start'));
-        console.log("🔍 game-start event dispatched after state updates");
-      }, 0);
+      
+      // Try to use the direct method if available
+      if (forceGameStartRef.current) {
+        console.log("🔍 GAME: Using direct forceGameStart method");
+        forceGameStartRef.current.forceGameStart();
+      } else {
+        console.log("🔍 GAME: forceGameStart method not available, using events");
+        
+        // Dispatch event after state updates with a longer timeout to ensure state updates have propagated
+        setTimeout(() => {
+          console.log("🔍 GAME: About to dispatch game-start event");
+          
+          // Create a custom event with a unique identifier
+          const startEvent = new CustomEvent('game-start', { 
+            detail: { timestamp: Date.now() } 
+          });
+          
+          // Dispatch the event
+          window.dispatchEvent(startEvent);
+          console.log("🔍 GAME: game-start event dispatched with timestamp:", startEvent.detail.timestamp);
+          
+          // Double-check that the event was dispatched by dispatching it again after a short delay
+          setTimeout(() => {
+            console.log("🔍 GAME: Dispatching game-start event again to ensure it's received");
+            window.dispatchEvent(new CustomEvent('game-start', { 
+              detail: { timestamp: Date.now(), retry: true } 
+            }));
+            
+            // Try a third time with a different event name
+            setTimeout(() => {
+              console.log("🔍 GAME: Dispatching game-active-force event as a fallback");
+              window.dispatchEvent(new CustomEvent('game-active-force', { 
+                detail: { timestamp: Date.now() } 
+              }));
+            }, 100);
+          }, 100);
+        }, 50);
+      }
     } else {
-      console.log("🔍 Game already started, skipping duplicate start");
+      console.log("🔍 GAME: Game already started, skipping duplicate start");
     }
   };
 
@@ -121,7 +177,10 @@ const Game = () => {
         camera={{ position: [0, 2, 5], fov: 60 }}
         style={{ background: '#1A1F2C' }}
       >
-        <GameScene />
+        <GameScene 
+          ref={forceGameStartRef}
+          forceGameActive={gameStarted} 
+        />
       </Canvas>
 
       <div className="absolute top-0 left-0 w-full p-4 text-white flex justify-between items-center">
@@ -148,12 +207,14 @@ const Game = () => {
         onRestart={handleRestart}
       />
 
-      {/* Instructions modal */}
-      <GameInstructionsModal
-        open={showInstructions}
-        onClose={() => setShowInstructions(false)}
-        onStart={startGame}
-      />
+      {/* Instructions modal - only render when showInstructions is true */}
+      {showInstructions && (
+        <GameInstructionsModal
+          open={true}
+          onClose={closeInstructions}
+          onStart={startGame}
+        />
+      )}
     </div>
   );
 };

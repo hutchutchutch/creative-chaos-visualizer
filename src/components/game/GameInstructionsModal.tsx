@@ -7,9 +7,10 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogClose
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Calendar, HelpCircle, ArrowRight } from 'lucide-react';
+import { Calendar, HelpCircle, ArrowRight, X } from 'lucide-react';
 
 interface GameInstructionsModalProps {
   open: boolean;
@@ -23,25 +24,33 @@ const GameInstructionsModal: React.FC<GameInstructionsModalProps> = ({
   onStart
 }) => {
   const handleStart = () => {
-    console.log("🔍 Got it button clicked, calling onStart and onClose...");
-    // Ensure we close the modal first and then start the game
-    onClose(); // Close the modal
-    // Delay starting the game slightly to ensure modal is closed first
-    setTimeout(() => {
-      onStart(); // Start the game after a slight delay
-      console.log("🔍 Starting game after modal close");
-    }, 100);
+    console.log("🔍 Got it button clicked, calling onClose and onStart...");
+    // Close the modal and start the game
+    onClose();
+    console.log("🔍 Modal closed, now calling onStart...");
+    onStart();
+    console.log("🔍 onStart called, game should be starting");
   };
 
+  // If not open, don't render anything
+  if (!open) return null;
+
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => {
+    <Dialog open={true} onOpenChange={(isOpen) => {
       if (!isOpen) {
-        console.log("🔍 Dialog closed via X button, calling onClose...");
-        onClose(); // Only call onClose when dialog is closed via X button
-        // Remove the onStart() call here to prevent duplicate game start
+        console.log("🔍 Dialog closed, calling onClose...");
+        onClose();
       }
     }}>
       <DialogContent className="bg-creative-dark border-creative-purple text-white max-w-lg">
+        {/* Custom close button */}
+        <button 
+          onClick={onClose} 
+          className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none"
+        >
+          <X className="h-4 w-4 text-white" />
+          <span className="sr-only">Close</span>
+        </button>
         <DialogHeader>
           <DialogTitle className="text-2xl text-center flex items-center justify-center gap-2">
             <HelpCircle className="text-creative-purple" />
