@@ -1,5 +1,5 @@
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
@@ -160,6 +160,7 @@ const GameScene = () => {
   
   // Function to update hour choices positions
   const updateHourChoices = useCallback(() => {
+    console.log('Updating hour choices, count:', hourChoices.length, 'game speed:', gameSpeed);
     setHourChoices(prev => {
       return prev
         .map(choice => {
@@ -174,7 +175,7 @@ const GameScene = () => {
         })
         .filter(choice => choice.position.z < 10); // Remove if too far past the player
     });
-  }, [gameSpeed]);
+  }, [gameSpeed, hourChoices.length]);
   
   // Main game loop
   useFrame(() => {
@@ -192,6 +193,13 @@ const GameScene = () => {
     
     // Update existing hour choices (move them)
     updateHourChoices();
+    
+    // Debug every 60 frames
+    if (frameCount.current % 60 === 0) {
+      console.log('Game loop - Frame:', frameCount.current, 
+        'Next choice in:', nextChoiceTime.current - frameCount.current,
+        'Hour choices:', hourChoices.length);
+    }
     
     // Spawn new hour choice objects
     if (frameCount.current >= nextChoiceTime.current) {
@@ -225,7 +233,7 @@ const GameScene = () => {
       <Lighting />
       
       {/* Player Character */}
-      <Character position={[camera.position.x, 0.75, 0]} />
+      <Character position={[LANES[playerLane], 0.75, 0]} />
       
       {/* Track with lane colors */}
       <Track />
