@@ -23,7 +23,7 @@ export const useGameState = () => {
     healthy: 5,
     helpful: 5
   });
-  const [gameActive, setGameActive] = useState(true);
+  const [gameActive, setGameActive] = useState(false); // Start with game paused
   const [currentHour, setCurrentHour] = useState(1);
   const [dailySchedule, setDailySchedule] = useState<string[]>(Array(16).fill(''));
 

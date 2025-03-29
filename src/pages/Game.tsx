@@ -5,6 +5,7 @@ import GameScene from '../components/GameScene';
 import HealthTraits from '../components/game/HealthTraits';
 import GameControls from '../components/game/GameControls';
 import GameOverlay from '../components/game/GameOverlay';
+import GameInstructionsModal from '../components/game/GameInstructionsModal';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 
@@ -17,6 +18,7 @@ const Game = () => {
     helpful: 5
   });
   const [schedule, setSchedule] = useState<string[]>(Array(16).fill(''));
+  const [showInstructions, setShowInstructions] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -119,6 +121,12 @@ const Game = () => {
         health={health}
         schedule={schedule}
         onRestart={handleRestart}
+      />
+
+      {/* Instructions modal */}
+      <GameInstructionsModal
+        open={showInstructions}
+        onClose={() => setShowInstructions(false)}
       />
     </div>
   );
