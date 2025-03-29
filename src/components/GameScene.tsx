@@ -1,5 +1,5 @@
 
-import React, { useRef } from 'react';
+import React, { useCallback } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 
 // Import our extracted components
@@ -10,7 +10,7 @@ import Background from './game/Background';
 import HourIndicator from './game/HourIndicator';
 import Lighting from './game/Lighting';
 
-// Import our new hooks
+// Import our hooks
 import { useGameState } from '../hooks/useGameState';
 import { useHourChoices } from '../hooks/useHourChoices';
 import { usePlayerControls } from '../hooks/usePlayerControls';
@@ -34,8 +34,8 @@ const GameScene = () => {
   // Hour choices management
   const { hourChoices, updateHourChoices, updateFrame } = useHourChoices(gameSpeed, gameActive);
   
-  // Player controls
-  const { getPlayerPosition } = usePlayerControls(playerLane, setPlayerLane, gameActive);
+  // Player controls with enhanced movement feedback
+  const { getPlayerPosition, isMoving, moveDirection } = usePlayerControls(playerLane, setPlayerLane, gameActive);
   
   // Main game loop
   useFrame(() => {
@@ -61,7 +61,11 @@ const GameScene = () => {
       <Lighting />
       
       {/* Player Character */}
-      <Character position={[getPlayerPosition(), 0.75, 0]} />
+      <Character 
+        position={[getPlayerPosition(), 0.75, 0]} 
+        isMoving={isMoving} 
+        moveDirection={moveDirection}
+      />
       
       {/* Track with lane colors */}
       <Track />

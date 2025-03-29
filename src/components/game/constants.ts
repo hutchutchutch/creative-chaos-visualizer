@@ -5,9 +5,9 @@ import * as THREE from 'three';
 export const LANE_WIDTH = 2;
 export const LANES = [-LANE_WIDTH, 0, LANE_WIDTH]; // Left, Middle, Right
 export const LANE_COLORS = {
-  happy: new THREE.Color("#4285F4"), // Bright blue
-  healthy: new THREE.Color("#34A853"), // Bright green
-  helpful: new THREE.Color("#8B5CF6")  // Vivid purple
+  happy: new THREE.Color("#FF6B6B"),    // Vibrant red for Happy
+  healthy: new THREE.Color("#4ECB71"),  // Bright green for Healthy
+  helpful: new THREE.Color("#4E8EFF")   // Bright blue for Helpful
 };
 export const LANE_TITLES = ["Happy", "Healthy", "Helpful"];
 

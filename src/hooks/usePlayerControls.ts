@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { LANES } from '../components/game/constants';
 
 export const usePlayerControls = (
@@ -7,21 +7,33 @@ export const usePlayerControls = (
   setPlayerLane: (lane: number) => void,
   gameActive: boolean
 ) => {
+  const [isMoving, setIsMoving] = useState(false);
+  const [moveDirection, setMoveDirection] = useState<'left' | 'right' | null>(null);
   
   useEffect(() => {
     // Handle player movement
     const handleMove = (e: CustomEvent) => {
       if (!gameActive) return;
       
-      const newLane = e.detail.direction === 'left' && playerLane > 0 
+      const direction = e.detail.direction as 'left' | 'right';
+      
+      const newLane = direction === 'left' && playerLane > 0 
         ? playerLane - 1 
-        : e.detail.direction === 'right' && playerLane < 2 
+        : direction === 'right' && playerLane < 2 
         ? playerLane + 1 
         : playerLane;
       
       if (newLane !== playerLane) {
-        console.log('Player moved to lane:', newLane);
+        console.log('Player moved to lane:', newLane, 'direction:', direction);
+        setMoveDirection(direction);
+        setIsMoving(true);
         setPlayerLane(newLane);
+        
+        // Reset moving state after transition completes
+        setTimeout(() => {
+          setIsMoving(false);
+          setMoveDirection(null);
+        }, 300);
       }
     };
     
@@ -38,6 +50,8 @@ export const usePlayerControls = (
   };
 
   return {
-    getPlayerPosition
+    getPlayerPosition,
+    isMoving,
+    moveDirection
   };
 };
