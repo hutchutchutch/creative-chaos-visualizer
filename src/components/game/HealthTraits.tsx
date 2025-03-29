@@ -29,8 +29,7 @@ const HealthTraits = ({ happy, healthy, helpful }: HealthTraitsProps) => {
             <Progress 
               className="h-2 bg-gray-700" 
               value={happyPercent} 
-              // Fixed styling to directly apply background color to the indicator
-              style={{ "--progress-foreground": "#D3E4FD" } as React.CSSProperties}
+              style={{ "--progress-foreground": "#4285F4" } as React.CSSProperties}
             />
           </div>
           
@@ -42,8 +41,7 @@ const HealthTraits = ({ happy, healthy, helpful }: HealthTraitsProps) => {
             <Progress 
               className="h-2 bg-gray-700" 
               value={healthyPercent}
-              // Fixed styling to directly apply background color to the indicator
-              style={{ "--progress-foreground": "#F2FCE2" } as React.CSSProperties}
+              style={{ "--progress-foreground": "#34A853" } as React.CSSProperties}
             />
           </div>
           
@@ -55,8 +53,7 @@ const HealthTraits = ({ happy, healthy, helpful }: HealthTraitsProps) => {
             <Progress 
               className="h-2 bg-gray-700" 
               value={helpfulPercent}
-              // Fixed styling to directly apply background color to the indicator
-              style={{ "--progress-foreground": "#E5DEFF" } as React.CSSProperties}
+              style={{ "--progress-foreground": "#8B5CF6" } as React.CSSProperties}
             />
           </div>
         </div>

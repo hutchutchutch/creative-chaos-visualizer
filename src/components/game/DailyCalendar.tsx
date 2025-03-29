@@ -16,9 +16,9 @@ const DailyCalendar = ({ schedule }: DailyCalendarProps) => {
 
   const getLaneColor = (activity: string) => {
     switch(activity) {
-      case "Happy": return "bg-[#D3E4FD] text-gray-800";
-      case "Healthy": return "bg-[#F2FCE2] text-gray-800";
-      case "Helpful": return "bg-[#E5DEFF] text-gray-800";
+      case "Happy": return "bg-[#4285F4] text-white";
+      case "Healthy": return "bg-[#34A853] text-white";
+      case "Helpful": return "bg-[#8B5CF6] text-white";
       default: return "bg-gray-200 text-gray-800";
     }
   };

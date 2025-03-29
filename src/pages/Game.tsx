@@ -105,7 +105,11 @@ const Game = () => {
 
       {/* Game HUD */}
       <div className="absolute top-0 left-0 w-full p-4 text-white flex justify-between items-center">
-        <Button variant="outline" onClick={handleBackToHome} className="text-white border-white">
+        <Button 
+          variant="outline" 
+          onClick={handleBackToHome} 
+          className="bg-black/50 text-white border-white hover:bg-black/80"
+        >
           Back to Home
         </Button>
         <div className="text-2xl font-bold">Hours Planned: {score}/16</div>
@@ -142,17 +146,17 @@ const Game = () => {
             </div>
             
             <div className="grid grid-cols-3 gap-4 mb-8">
-              <div className="bg-[#D3E4FD] rounded-lg p-4 text-gray-800">
+              <div className="bg-[#4285F4] rounded-lg p-4 text-white">
                 <h3 className="font-bold text-lg">Happy</h3>
                 <p className="text-3xl font-bold">{health.happy.toFixed(1)}</p>
                 <p className="text-sm">health</p>
               </div>
-              <div className="bg-[#F2FCE2] rounded-lg p-4 text-gray-800">
+              <div className="bg-[#34A853] rounded-lg p-4 text-white">
                 <h3 className="font-bold text-lg">Healthy</h3>
                 <p className="text-3xl font-bold">{health.healthy.toFixed(1)}</p>
                 <p className="text-sm">health</p>
               </div>
-              <div className="bg-[#E5DEFF] rounded-lg p-4 text-gray-800">
+              <div className="bg-[#8B5CF6] rounded-lg p-4 text-white">
                 <h3 className="font-bold text-lg">Helpful</h3>
                 <p className="text-3xl font-bold">{health.helpful.toFixed(1)}</p>
                 <p className="text-sm">health</p>
@@ -163,7 +167,11 @@ const Game = () => {
               <Button onClick={handleRestart} className="bg-creative-purple hover:bg-creative-purple/90 px-6 py-2">
                 Plan Another Day
               </Button>
-              <Button variant="outline" onClick={handleBackToHome} className="border-white text-white">
+              <Button 
+                variant="outline" 
+                onClick={handleBackToHome} 
+                className="bg-black/50 text-white border-white hover:bg-black/80"
+              >
                 Back to Home
               </Button>
             </div>

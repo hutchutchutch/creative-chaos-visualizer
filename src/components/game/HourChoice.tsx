@@ -29,10 +29,13 @@ const HourChoice = ({ position, laneIndex, onCollide }: HourChoiceProps) => {
   
   useFrame(({ camera }) => {
     if (meshRef.current) {
-      // Move object toward player
-      meshRef.current.position.z += 0.2;
+      // Move object toward player (positive Z direction)
+      meshRef.current.position.z += 0.15;
       
-      // Check if object is passed the player
+      // Add a slight rotation for visual effect
+      meshRef.current.rotation.y += 0.01;
+      
+      // Check if object has passed the player
       if (meshRef.current.position.z > 4 && !passed) {
         setPassed(true);
         // Determine if player made the right choice
@@ -51,19 +54,21 @@ const HourChoice = ({ position, laneIndex, onCollide }: HourChoiceProps) => {
   });
   
   return (
-    <mesh ref={meshRef} position={position} castShadow>
-      <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color={getLaneColor(laneIndex)} />
+    <group position={position}>
+      <mesh ref={meshRef} castShadow>
+        <boxGeometry args={[1.2, 1.2, 1.2]} />
+        <meshStandardMaterial color={getLaneColor(laneIndex)} emissive={getLaneColor(laneIndex)} emissiveIntensity={0.3} />
+      </mesh>
       <Text
-        position={[0, 1.2, 0]}
-        fontSize={0.3}
-        color="#333333"
+        position={[0, 1.5, 0]}
+        fontSize={0.4}
+        color="#FFFFFF"
         anchorX="center"
         anchorY="middle"
       >
         {`Hour ${Math.floor(Math.random() * 12) + 1}`}
       </Text>
-    </mesh>
+    </group>
   );
 };
 
