@@ -19,13 +19,19 @@ const Game = () => {
   });
   const [schedule, setSchedule] = useState<string[]>(Array(16).fill(''));
   const [showInstructions, setShowInstructions] = useState(true);
+  const [gameStarted, setGameStarted] = useState(false); // Track if game has been started
   const navigate = useNavigate();
 
   const startGame = () => {
     console.log("🔍 startGame called in Game.tsx, dispatching game-start event...");
-    window.dispatchEvent(new CustomEvent('game-start'));
-    console.log("🔍 game-start event dispatched");
-    setGameOver(false);
+    if (!gameStarted) { // Only start the game if it hasn't been started yet
+      setGameStarted(true);
+      window.dispatchEvent(new CustomEvent('game-start'));
+      console.log("🔍 game-start event dispatched");
+      setGameOver(false);
+    } else {
+      console.log("🔍 Game already started, skipping duplicate start");
+    }
   };
 
   useEffect(() => {
@@ -55,6 +61,7 @@ const Game = () => {
     
     const handleGameOver = () => {
       setGameOver(true);
+      setGameStarted(false); // Reset game started state when game is over
     };
     
     const handleChoicesUpdate = (e: CustomEvent) => {
@@ -68,6 +75,7 @@ const Game = () => {
     
     const handleGameStart = () => {
       console.log("🔍 Game-start event received in Game.tsx");
+      setGameStarted(true);
     };
     
     window.addEventListener('score-update', handleScoreUpdate as EventListener);
@@ -95,6 +103,7 @@ const Game = () => {
       helpful: 5
     });
     setSchedule(Array(16).fill(''));
+    setGameStarted(false);
     window.dispatchEvent(new CustomEvent('game-restart'));
   };
 

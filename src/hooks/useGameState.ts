@@ -31,6 +31,20 @@ export const useGameState = () => {
   useEffect(() => {
     console.log("🔍 useGameState: gameActive changed to:", gameActive);
   }, [gameActive]);
+  
+  // Listen for game-start event
+  useEffect(() => {
+    const handleGameStart = () => {
+      console.log("🔍 useGameState: Received game-start event, setting gameActive to true");
+      setGameActive(true);
+    };
+    
+    window.addEventListener('game-start', handleGameStart);
+    
+    return () => {
+      window.removeEventListener('game-start', handleGameStart);
+    };
+  }, []);
 
   // Debug info - log important game state every few seconds
   useEffect(() => {

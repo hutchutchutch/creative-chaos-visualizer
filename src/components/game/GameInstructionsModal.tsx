@@ -31,9 +31,9 @@ const GameInstructionsModal: React.FC<GameInstructionsModalProps> = ({
   return (
     <Dialog open={open} onOpenChange={(isOpen) => {
       if (!isOpen) {
-        console.log("🔍 Dialog closed via X button, calling onClose and onStart...");
-        onClose();
-        onStart(); // Also start the game when dialog is closed using the X button
+        console.log("🔍 Dialog closed via X button, calling onClose...");
+        onClose(); // Only call onClose when dialog is closed via X button
+        // Remove the onStart() call here to prevent duplicate game start
       }
     }}>
       <DialogContent className="bg-creative-dark border-creative-purple text-white max-w-lg">
