@@ -1,183 +1,24 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { Box, Text, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 
-// Lane configuration
-const LANE_WIDTH = 2;
-const LANES = [-LANE_WIDTH, 0, LANE_WIDTH]; // Left, Middle, Right
-const LANE_COLORS = {
-  happy: new THREE.Color("#D3E4FD"), // Light Blue
-  healthy: new THREE.Color("#F2FCE2"), // Light Green
-  helpful: new THREE.Color("#E5DEFF")  // Light Purple
-};
-const LANE_TITLES = ["Happy", "Healthy", "Helpful"];
+// Import our extracted components
+import Character from './game/Character';
+import HourChoice from './game/HourChoice';
+import Track from './game/Track';
+import Background from './game/Background';
+import HourIndicator from './game/HourIndicator';
+import Lighting from './game/Lighting';
 
-// Game constants
-const GAME_SPEED_INITIAL = 0.1;
-const GAME_SPEED_INCREMENT = 0.0001;
-const OBSTACLE_INTERVAL_MIN = 60;
-const OBSTACLE_INTERVAL_MAX = 100;
-
-// Character component
-const Character = ({ position }: { position: [number, number, number] }) => {
-  const meshRef = useRef<THREE.Mesh>(null);
-  
-  return (
-    <mesh ref={meshRef} position={position} castShadow>
-      <boxGeometry args={[0.8, 1.5, 0.8]} />
-      <meshStandardMaterial color="#E5DEFF" />
-    </mesh>
-  );
-};
-
-// Hour choice object
-const HourChoice = ({ 
-  position, 
-  laneIndex,
-  onCollide 
-}: { 
-  position: [number, number, number], 
-  laneIndex: number,
-  onCollide: (lane: number) => void 
-}) => {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const [passed, setPassed] = useState(false);
-  
-  // Get lane color based on index
-  const getLaneColor = (index: number) => {
-    switch(index) {
-      case 0: return LANE_COLORS.happy;
-      case 1: return LANE_COLORS.healthy;
-      case 2: return LANE_COLORS.helpful;
-      default: return new THREE.Color("#FFFFFF");
-    }
-  };
-  
-  useFrame(({ camera }) => {
-    if (meshRef.current) {
-      // Move object toward player
-      meshRef.current.position.z += 0.2;
-      
-      // Check if object is passed the player
-      if (meshRef.current.position.z > 4 && !passed) {
-        setPassed(true);
-        // Determine if player made the right choice
-        const playerLane = Math.round((camera.position.x + LANE_WIDTH) / LANE_WIDTH);
-        if (playerLane === laneIndex) {
-          // Player picked this hour choice
-          onCollide(laneIndex);
-        }
-      }
-      
-      // Remove if too far
-      if (meshRef.current.position.z > 10) {
-        meshRef.current.removeFromParent();
-      }
-    }
-  });
-  
-  return (
-    <mesh ref={meshRef} position={position} castShadow>
-      <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color={getLaneColor(laneIndex)} />
-      <Text
-        position={[0, 1.2, 0]}
-        fontSize={0.3}
-        color="#333333"
-        anchorX="center"
-        anchorY="middle"
-      >
-        {`Hour ${Math.floor(Math.random() * 12) + 1}`}
-      </Text>
-    </mesh>
-  );
-};
-
-// Lane headers
-const LaneHeaders = () => {
-  return (
-    <group position={[0, 2.5, -30]}>
-      {LANES.map((lane, index) => (
-        <group key={index} position={[lane, 0, 0]}>
-          <Text
-            position={[0, 0, 0]}
-            fontSize={1.5}
-            color="#333333"
-            font="/fonts/Inter-Bold.woff"
-            anchorX="center"
-            anchorY="middle"
-          >
-            {LANE_TITLES[index]}
-          </Text>
-          {/* Lane color indicator */}
-          <mesh position={[0, -1.5, 0]}>
-            <boxGeometry args={[1.8, 0.5, 0.1]} />
-            <meshStandardMaterial color={
-              index === 0 ? LANE_COLORS.happy : 
-              index === 1 ? LANE_COLORS.healthy : 
-              LANE_COLORS.helpful
-            } />
-          </mesh>
-        </group>
-      ))}
-    </group>
-  );
-};
-
-// Colored Lane
-const Lane = ({ index }: { index: number }) => {
-  const color = 
-    index === 0 ? LANE_COLORS.happy : 
-    index === 1 ? LANE_COLORS.healthy : 
-    LANE_COLORS.helpful;
-  
-  return (
-    <mesh 
-      rotation={[-Math.PI / 2, 0, 0]} 
-      position={[LANES[index], -0.49, 0]} 
-      receiveShadow
-    >
-      <planeGeometry args={[LANE_WIDTH * 0.9, 100]} />
-      <meshStandardMaterial color={color} opacity={0.7} transparent />
-    </mesh>
-  );
-};
-
-// Track component
-const Track = () => {
-  return (
-    <group>
-      {/* Base track */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]} receiveShadow>
-        <planeGeometry args={[10, 100]} />
-        <meshStandardMaterial color="#333" />
-      </mesh>
-      
-      {/* Colored lanes */}
-      <Lane index={0} />
-      <Lane index={1} />
-      <Lane index={2} />
-      
-      {/* Lane dividers */}
-      {[-1, 1].map((offset, i) => (
-        <mesh 
-          key={i}
-          rotation={[-Math.PI / 2, 0, 0]} 
-          position={[offset * LANE_WIDTH, -0.48, 0]} 
-          receiveShadow
-        >
-          <planeGeometry args={[0.1, 100]} />
-          <meshStandardMaterial color="#FFFFFF" />
-        </mesh>
-      ))}
-      
-      {/* Lane headers */}
-      <LaneHeaders />
-    </group>
-  );
-};
+// Import constants
+import { 
+  LANES, 
+  GAME_SPEED_INITIAL, 
+  GAME_SPEED_INCREMENT, 
+  OBSTACLE_INTERVAL_MIN,
+  OBSTACLE_INTERVAL_MAX
+} from './game/constants';
 
 const GameScene = () => {
   const { camera } = useThree();
@@ -195,11 +36,7 @@ const GameScene = () => {
     (OBSTACLE_INTERVAL_MAX - OBSTACLE_INTERVAL_MIN) + OBSTACLE_INTERVAL_MIN));
   const frameCount = useRef(0);
   
-  // Load desk model for background elements
-  const { scene } = useGLTF('/desk3.glb');
-  const deskRef = useRef<THREE.Group>(null);
-  
-  // Handle score updates for lane decision - Define the handleLaneDecision function here
+  // Handle score updates for lane decision
   const handleLaneDecision = (laneIdx: number) => {
     if (laneIdx === 0) {
       setChoices(prev => ({...prev, happy: prev.happy + 1}));
@@ -219,15 +56,6 @@ const GameScene = () => {
   };
   
   useEffect(() => {
-    if (scene && deskRef.current) {
-      // Clone and add the desk model
-      const deskScene = scene.clone();
-      deskScene.scale.set(0.5, 0.5, 0.5);
-      deskScene.position.set(0, 0, -50);
-      deskScene.rotation.y = Math.PI;
-      deskRef.current.add(deskScene);
-    }
-    
     // Handle player movement
     const handleMove = (e: CustomEvent) => {
       if (!gameActive) return;
@@ -260,7 +88,7 @@ const GameScene = () => {
       window.removeEventListener('game-move', handleMove as EventListener);
       window.removeEventListener('game-restart', handleRestart);
     };
-  }, [playerLane, gameActive, scene]);
+  }, [playerLane, gameActive]);
   
   // Handle game over at 24 hours
   useEffect(() => {
@@ -311,22 +139,7 @@ const GameScene = () => {
   return (
     <>
       {/* Lighting */}
-      <ambientLight intensity={0.5} />
-      <directionalLight 
-        position={[10, 10, 5]} 
-        intensity={1.0} 
-        castShadow 
-        shadow-mapSize-width={1024} 
-        shadow-mapSize-height={1024} 
-      />
-      <spotLight 
-        position={[-5, 8, 5]} 
-        angle={0.5} 
-        penumbra={0.8} 
-        intensity={1.5} 
-        castShadow 
-        color="#9b87f5" 
-      />
+      <Lighting />
       
       {/* Player Character */}
       <Character position={[camera.position.x, 0.75, 3]} />
@@ -334,8 +147,8 @@ const GameScene = () => {
       {/* Track with lane colors */}
       <Track />
       
-      {/* Background Elements (Desk model) */}
-      <group ref={deskRef} />
+      {/* Background Elements */}
+      <Background />
       
       {/* Hour Choice Objects */}
       {hourChoices.map((choice, i) => (
@@ -348,21 +161,7 @@ const GameScene = () => {
       ))}
       
       {/* Current hour indicator */}
-      <Text 
-        position={[0, 3.5, -10]}
-        fontSize={1.2}
-        color="#FFFFFF"
-        anchorX="center"
-        anchorY="middle"
-      >
-        {`Hour ${currentHour} of 24`}
-      </Text>
-      
-      {/* Sky */}
-      <mesh position={[0, 0, -100]}>
-        <planeGeometry args={[200, 100]} />
-        <meshStandardMaterial color="#1a1a2e" />
-      </mesh>
+      <HourIndicator currentHour={currentHour} />
     </>
   );
 };
