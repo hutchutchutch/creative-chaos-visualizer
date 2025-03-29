@@ -13,7 +13,7 @@ const HourIndicator = ({ currentHour, totalHours = 16 }: HourIndicatorProps) => 
       {/* Background plane for better visibility */}
       <mesh position={[0, 3.5, -5.01]}>
         <planeGeometry args={[6, 1.5]} />
-        <meshBasicMaterial color="#000000" opacity={0.7} transparent />
+        <meshBasicMaterial color="#000000" opacity={0.8} transparent />
       </mesh>
       
       {/* Text indicator */}

@@ -30,16 +30,31 @@ const GameScene = () => {
     healthy: 5,
     helpful: 5
   });
-  const [hourChoices, setHourChoices] = useState<{position: THREE.Vector3, lane: number}[]>([]);
+  const [hourChoices, setHourChoices] = useState<{position: THREE.Vector3, lane: number, id: number}[]>([]);
   const [gameActive, setGameActive] = useState(true);
   const [currentHour, setCurrentHour] = useState(1);
   const [dailySchedule, setDailySchedule] = useState<string[]>(Array(16).fill(''));
   const nextChoiceTime = useRef(Math.floor(Math.random() * 
     (OBSTACLE_INTERVAL_MAX - OBSTACLE_INTERVAL_MIN) + OBSTACLE_INTERVAL_MIN));
   const frameCount = useRef(0);
+  const choiceIdCounter = useRef(0);
+  
+  // Debug info
+  useEffect(() => {
+    console.log('GameScene initialized with:', { 
+      playerLane, 
+      gameSpeed, 
+      health, 
+      hourChoices: hourChoices.length, 
+      gameActive, 
+      currentHour 
+    });
+  }, []);
   
   // Handle health updates for lane decision
   const handleLaneDecision = (laneIdx: number) => {
+    console.log('Lane decision made:', { laneIdx, currentHour });
+    
     // Record the choice for the daily schedule
     const newSchedule = [...dailySchedule];
     newSchedule[currentHour - 1] = LANE_TITLES[laneIdx];
@@ -64,6 +79,7 @@ const GameScene = () => {
         newHealth.healthy = Math.max(0, prev.healthy - 0.2);
       }
       
+      console.log('Health updated:', newHealth);
       return newHealth;
     });
     
@@ -86,15 +102,21 @@ const GameScene = () => {
     const handleMove = (e: CustomEvent) => {
       if (!gameActive) return;
       
-      if (e.detail.direction === 'left' && playerLane > 0) {
-        setPlayerLane(prev => prev - 1);
-      } else if (e.detail.direction === 'right' && playerLane < 2) {
-        setPlayerLane(prev => prev + 1);
+      const newLane = e.detail.direction === 'left' && playerLane > 0 
+        ? playerLane - 1 
+        : e.detail.direction === 'right' && playerLane < 2 
+        ? playerLane + 1 
+        : playerLane;
+      
+      if (newLane !== playerLane) {
+        console.log('Player moved to lane:', newLane);
+        setPlayerLane(newLane);
       }
     };
     
     // Handle game restart
     const handleRestart = () => {
+      console.log('Game restarted');
       setGameActive(true);
       setCurrentHour(1);
       setHealth({happy: 5, healthy: 5, helpful: 5});
@@ -102,6 +124,7 @@ const GameScene = () => {
       setGameSpeed(GAME_SPEED_INITIAL);
       setDailySchedule(Array(16).fill(''));
       frameCount.current = 0;
+      choiceIdCounter.current = 0;
       
       window.dispatchEvent(new CustomEvent('score-update', { 
         detail: { score: 0, type: 'set' } 
@@ -124,6 +147,7 @@ const GameScene = () => {
   // Handle game over at 16 hours
   useEffect(() => {
     if (currentHour > 16 && gameActive) {
+      console.log('Game over reached, health:', health, 'schedule:', dailySchedule);
       setGameActive(false);
       window.dispatchEvent(new CustomEvent('game-over'));
       
@@ -133,6 +157,24 @@ const GameScene = () => {
       }));
     }
   }, [currentHour, health, gameActive, dailySchedule]);
+  
+  // Function to update hour choices positions
+  const updateHourChoices = useCallback(() => {
+    setHourChoices(prev => {
+      return prev
+        .map(choice => {
+          // Move objects toward the player
+          const newPosition = new THREE.Vector3(
+            choice.position.x,
+            choice.position.y,
+            choice.position.z + gameSpeed * 2
+          );
+          
+          return { ...choice, position: newPosition };
+        })
+        .filter(choice => choice.position.z < 10); // Remove if too far past the player
+    });
+  }, [gameSpeed]);
   
   // Main game loop
   useFrame(() => {
@@ -148,17 +190,27 @@ const GameScene = () => {
     // Increase game speed over time
     setGameSpeed(prev => prev + GAME_SPEED_INCREMENT);
     
+    // Update existing hour choices (move them)
+    updateHourChoices();
+    
     // Spawn new hour choice objects
     if (frameCount.current >= nextChoiceTime.current) {
       // Random lane for hour choice
       const lane = Math.floor(Math.random() * 3);
+      const newId = choiceIdCounter.current++;
+      
       const newChoicePosition = new THREE.Vector3(
         LANES[lane],
-        0,
+        0.5, // Position slightly above ground
         -50 // Far ahead
       );
       
-      setHourChoices(prev => [...prev, {position: newChoicePosition, lane}]);
+      setHourChoices(prev => [
+        ...prev, 
+        {position: newChoicePosition, lane, id: newId}
+      ]);
+      
+      console.log('Spawned new hour choice:', { lane, id: newId, z: -50 });
       
       // Reset counter and set next choice time
       frameCount.current = 0;
@@ -173,7 +225,7 @@ const GameScene = () => {
       <Lighting />
       
       {/* Player Character */}
-      <Character position={[camera.position.x, 0.75, 3]} />
+      <Character position={[camera.position.x, 0.75, 0]} />
       
       {/* Track with lane colors */}
       <Track />
@@ -182,12 +234,14 @@ const GameScene = () => {
       <Background />
       
       {/* Hour Choice Objects */}
-      {hourChoices.map((choice, i) => (
+      {hourChoices.map((choice) => (
         <HourChoice 
-          key={i} 
-          position={[choice.position.x, 0.5, choice.position.z]}
+          key={choice.id} 
+          position={[choice.position.x, choice.position.y, choice.position.z]}
           laneIndex={choice.lane}
           onCollide={handleLaneDecision}
+          playerLane={playerLane}
+          gameSpeed={gameSpeed}
         />
       ))}
       

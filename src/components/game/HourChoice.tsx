@@ -1,21 +1,29 @@
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Text } from '@react-three/drei';
 import * as THREE from 'three';
 
 // Import lane colors from constants
-import { LANE_COLORS } from './constants';
+import { LANE_COLORS, LANES } from './constants';
 
 interface HourChoiceProps {
   position: [number, number, number];
   laneIndex: number;
   onCollide: (lane: number) => void;
+  playerLane: number;
+  gameSpeed: number;
 }
 
-const HourChoice = ({ position, laneIndex, onCollide }: HourChoiceProps) => {
+const HourChoice = ({ position, laneIndex, onCollide, playerLane, gameSpeed }: HourChoiceProps) => {
   const meshRef = useRef<THREE.Mesh>(null);
   const [passed, setPassed] = useState(false);
+  const [hour] = useState(Math.floor(Math.random() * 12) + 1);
+  
+  // For debugging
+  useEffect(() => {
+    console.log('Hour choice created:', { position, laneIndex, hour });
+  }, []);
   
   // Get lane color based on index
   const getLaneColor = (index: number) => {
@@ -27,28 +35,36 @@ const HourChoice = ({ position, laneIndex, onCollide }: HourChoiceProps) => {
     }
   };
   
-  useFrame(({ camera }) => {
-    if (meshRef.current) {
+  useFrame(() => {
+    if (meshRef.current && !passed) {
+      // Get current position
+      const z = meshRef.current.position.z;
+      
       // Move object toward player (positive Z direction)
-      meshRef.current.position.z += 0.15;
+      meshRef.current.position.z += gameSpeed * 2;
       
       // Add a slight rotation for visual effect
       meshRef.current.rotation.y += 0.01;
       
       // Check if object has passed the player
-      if (meshRef.current.position.z > 4 && !passed) {
-        setPassed(true);
-        // Determine if player made the right choice
-        const playerLane = Math.round((camera.position.x + LANE_WIDTH) / LANE_WIDTH);
-        if (playerLane === laneIndex) {
-          // Player picked this hour choice
+      if (z > 0 && z < 5) {
+        // In collision range
+        if (playerLane === laneIndex && !passed) {
+          console.log('Collision detected with hour choice:', { 
+            laneIndex, 
+            playerLane, 
+            z: meshRef.current.position.z,
+            hour 
+          });
+          setPassed(true);
           onCollide(laneIndex);
         }
       }
       
-      // Remove if too far
-      if (meshRef.current.position.z > 10) {
-        meshRef.current.removeFromParent();
+      // If passed player without collision, mark as passed
+      if (z >= 5 && !passed) {
+        console.log('Hour choice missed:', { laneIndex, playerLane, z });
+        setPassed(true);
       }
     }
   });
@@ -57,22 +73,25 @@ const HourChoice = ({ position, laneIndex, onCollide }: HourChoiceProps) => {
     <group position={position}>
       <mesh ref={meshRef} castShadow>
         <boxGeometry args={[1.2, 1.2, 1.2]} />
-        <meshStandardMaterial color={getLaneColor(laneIndex)} emissive={getLaneColor(laneIndex)} emissiveIntensity={0.3} />
+        <meshStandardMaterial 
+          color={getLaneColor(laneIndex)} 
+          emissive={getLaneColor(laneIndex)} 
+          emissiveIntensity={0.5} 
+        />
       </mesh>
       <Text
         position={[0, 1.5, 0]}
-        fontSize={0.4}
+        fontSize={0.5}
         color="#FFFFFF"
         anchorX="center"
         anchorY="middle"
+        fontWeight="bold"
       >
-        {`Hour ${Math.floor(Math.random() * 12) + 1}`}
+        {`Hour ${hour}`}
       </Text>
     </group>
   );
 };
 
 // Export LANE_WIDTH for use in this component
-const LANE_WIDTH = 2;
-export { LANE_WIDTH };
 export default HourChoice;
