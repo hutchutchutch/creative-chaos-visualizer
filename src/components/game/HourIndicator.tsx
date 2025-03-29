@@ -4,9 +4,10 @@ import { Text } from '@react-three/drei';
 
 interface HourIndicatorProps {
   currentHour: number;
+  totalHours: number;
 }
 
-const HourIndicator = ({ currentHour }: HourIndicatorProps) => {
+const HourIndicator = ({ currentHour, totalHours = 16 }: HourIndicatorProps) => {
   return (
     <Text 
       position={[0, 3.5, -10]}
@@ -15,7 +16,7 @@ const HourIndicator = ({ currentHour }: HourIndicatorProps) => {
       anchorX="center"
       anchorY="middle"
     >
-      {`Hour ${currentHour} of 24`}
+      {`Hour ${currentHour} of ${totalHours}`}
     </Text>
   );
 };

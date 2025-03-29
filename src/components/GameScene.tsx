@@ -17,34 +17,55 @@ import {
   GAME_SPEED_INITIAL, 
   GAME_SPEED_INCREMENT, 
   OBSTACLE_INTERVAL_MIN,
-  OBSTACLE_INTERVAL_MAX
+  OBSTACLE_INTERVAL_MAX,
+  LANE_TITLES
 } from './game/constants';
 
 const GameScene = () => {
   const { camera } = useThree();
   const [playerLane, setPlayerLane] = useState(1); // Start in middle lane (index 1)
   const [gameSpeed, setGameSpeed] = useState(GAME_SPEED_INITIAL);
-  const [choices, setChoices] = useState<{happy: number, healthy: number, helpful: number}>({
-    happy: 0,
-    healthy: 0,
-    helpful: 0
+  const [health, setHealth] = useState<{happy: number, healthy: number, helpful: number}>({
+    happy: 5, // Start with mid-level health
+    healthy: 5,
+    helpful: 5
   });
   const [hourChoices, setHourChoices] = useState<{position: THREE.Vector3, lane: number}[]>([]);
   const [gameActive, setGameActive] = useState(true);
   const [currentHour, setCurrentHour] = useState(1);
+  const [dailySchedule, setDailySchedule] = useState<string[]>(Array(16).fill(''));
   const nextChoiceTime = useRef(Math.floor(Math.random() * 
     (OBSTACLE_INTERVAL_MAX - OBSTACLE_INTERVAL_MIN) + OBSTACLE_INTERVAL_MIN));
   const frameCount = useRef(0);
   
-  // Handle score updates for lane decision
+  // Handle health updates for lane decision
   const handleLaneDecision = (laneIdx: number) => {
-    if (laneIdx === 0) {
-      setChoices(prev => ({...prev, happy: prev.happy + 1}));
-    } else if (laneIdx === 1) {
-      setChoices(prev => ({...prev, healthy: prev.healthy + 1}));
-    } else if (laneIdx === 2) {
-      setChoices(prev => ({...prev, helpful: prev.helpful + 1}));
-    }
+    // Record the choice for the daily schedule
+    const newSchedule = [...dailySchedule];
+    newSchedule[currentHour - 1] = LANE_TITLES[laneIdx];
+    setDailySchedule(newSchedule);
+    
+    // Update health traits based on choice
+    setHealth(prev => {
+      const newHealth = { ...prev };
+      
+      // Increase chosen trait
+      if (laneIdx === 0) {
+        newHealth.happy = Math.min(10, prev.happy + 0.8);
+        newHealth.healthy = Math.max(0, prev.healthy - 0.2);
+        newHealth.helpful = Math.max(0, prev.helpful - 0.2);
+      } else if (laneIdx === 1) {
+        newHealth.healthy = Math.min(10, prev.healthy + 0.8);
+        newHealth.happy = Math.max(0, prev.happy - 0.2);
+        newHealth.helpful = Math.max(0, prev.helpful - 0.2);
+      } else if (laneIdx === 2) {
+        newHealth.helpful = Math.min(10, prev.helpful + 0.8);
+        newHealth.happy = Math.max(0, prev.happy - 0.2);
+        newHealth.healthy = Math.max(0, prev.healthy - 0.2);
+      }
+      
+      return newHealth;
+    });
     
     // Advance to next hour
     setCurrentHour(prev => prev + 1);
@@ -52,6 +73,11 @@ const GameScene = () => {
     // Update score to track total decisions made
     window.dispatchEvent(new CustomEvent('score-update', { 
       detail: { score: 1, type: 'add' } 
+    }));
+
+    // Also dispatch health update event
+    window.dispatchEvent(new CustomEvent('health-update', {
+      detail: { health }
     }));
   };
   
@@ -71,13 +97,18 @@ const GameScene = () => {
     const handleRestart = () => {
       setGameActive(true);
       setCurrentHour(1);
-      setChoices({happy: 0, healthy: 0, helpful: 0});
+      setHealth({happy: 5, healthy: 5, helpful: 5});
       setHourChoices([]);
       setGameSpeed(GAME_SPEED_INITIAL);
+      setDailySchedule(Array(16).fill(''));
       frameCount.current = 0;
       
       window.dispatchEvent(new CustomEvent('score-update', { 
         detail: { score: 0, type: 'set' } 
+      }));
+
+      window.dispatchEvent(new CustomEvent('health-update', {
+        detail: { health: {happy: 5, healthy: 5, helpful: 5} }
       }));
     };
     
@@ -90,18 +121,18 @@ const GameScene = () => {
     };
   }, [playerLane, gameActive]);
   
-  // Handle game over at 24 hours
+  // Handle game over at 16 hours
   useEffect(() => {
-    if (currentHour > 24 && gameActive) {
+    if (currentHour > 16 && gameActive) {
       setGameActive(false);
       window.dispatchEvent(new CustomEvent('game-over'));
       
-      // Send choices data to display in game over screen
+      // Send health data and schedule to display in game over screen
       window.dispatchEvent(new CustomEvent('game-choices', { 
-        detail: { choices } 
+        detail: { health, schedule: dailySchedule } 
       }));
     }
-  }, [currentHour, choices, gameActive]);
+  }, [currentHour, health, gameActive, dailySchedule]);
   
   // Main game loop
   useFrame(() => {
@@ -161,7 +192,7 @@ const GameScene = () => {
       ))}
       
       {/* Current hour indicator */}
-      <HourIndicator currentHour={currentHour} />
+      <HourIndicator currentHour={currentHour} totalHours={16} />
     </>
   );
 };
