@@ -59,6 +59,20 @@ const GameScene = () => {
     resetFrameCounters
   });
   
+  // Listen for game start event
+  useEffect(() => {
+    const handleGameStart = () => {
+      console.log("Game starting from event...");
+      setGameActive(true);
+    };
+    
+    window.addEventListener('game-start', handleGameStart);
+    
+    return () => {
+      window.removeEventListener('game-start', handleGameStart);
+    };
+  }, [setGameActive]);
+  
   // Main game loop
   useFrame(() => {
     if (!gameActive) return;

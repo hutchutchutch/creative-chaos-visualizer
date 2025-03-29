@@ -14,15 +14,25 @@ import { Calendar, HelpCircle, ArrowRight } from 'lucide-react';
 interface GameInstructionsModalProps {
   open: boolean;
   onClose: () => void;
+  onStart: () => void;
 }
 
 const GameInstructionsModal: React.FC<GameInstructionsModalProps> = ({
   open,
-  onClose
+  onClose,
+  onStart
 }) => {
+  const handleStart = () => {
+    onStart(); // Start the game
+    onClose(); // Close the modal
+  };
+
   return (
     <Dialog open={open} onOpenChange={(isOpen) => {
-      if (!isOpen) onClose();
+      if (!isOpen) {
+        onClose();
+        onStart(); // Also start the game when dialog is closed using the X button
+      }
     }}>
       <DialogContent className="bg-creative-dark border-creative-purple text-white max-w-lg">
         <DialogHeader>
@@ -75,7 +85,7 @@ const GameInstructionsModal: React.FC<GameInstructionsModalProps> = ({
         </div>
         
         <DialogFooter>
-          <Button onClick={onClose} className="w-full bg-creative-purple hover:bg-creative-purple/90">
+          <Button onClick={handleStart} className="w-full bg-creative-purple hover:bg-creative-purple/90">
             Got it! Let's Plan My Day
           </Button>
         </DialogFooter>

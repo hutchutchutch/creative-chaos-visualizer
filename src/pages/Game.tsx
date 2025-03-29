@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import GameScene from '../components/GameScene';
@@ -20,6 +19,11 @@ const Game = () => {
   const [schedule, setSchedule] = useState<string[]>(Array(16).fill(''));
   const [showInstructions, setShowInstructions] = useState(true);
   const navigate = useNavigate();
+
+  const startGame = () => {
+    window.dispatchEvent(new CustomEvent('game-start'));
+    setGameOver(false);
+  };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -59,10 +63,15 @@ const Game = () => {
       }
     };
     
+    const handleGameStart = () => {
+      console.log('Game started');
+    };
+    
     window.addEventListener('score-update', handleScoreUpdate as EventListener);
     window.addEventListener('health-update', handleHealthUpdate as EventListener);
     window.addEventListener('game-over', handleGameOver);
     window.addEventListener('game-choices', handleChoicesUpdate as EventListener);
+    window.addEventListener('game-start', handleGameStart);
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
@@ -70,6 +79,7 @@ const Game = () => {
       window.removeEventListener('health-update', handleHealthUpdate as EventListener);
       window.removeEventListener('game-over', handleGameOver);
       window.removeEventListener('game-choices', handleChoicesUpdate as EventListener);
+      window.removeEventListener('game-start', handleGameStart);
     };
   }, []);
 
@@ -127,6 +137,7 @@ const Game = () => {
       <GameInstructionsModal
         open={showInstructions}
         onClose={() => setShowInstructions(false)}
+        onStart={startGame}
       />
     </div>
   );
