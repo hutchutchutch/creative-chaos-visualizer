@@ -11,10 +11,10 @@ interface DeskSceneProps {
 }
 
 const DeskScene: React.FC<DeskSceneProps> = ({ modelData }) => {
-  // Use our custom camera hook
+  // Use our custom camera hook with adjusted parameters for better viewing
   const cameraRef = useOrbitalCamera({
-    radius: 6,
-    height: 2.5,
+    radius: 4, // Decreased radius to make the desk appear larger
+    height: 2.0, // Adjusted height
     speed: 0.03,
   });
 
@@ -36,9 +36,11 @@ const DeskScene: React.FC<DeskSceneProps> = ({ modelData }) => {
       // Add the model scene
       const modelScene = modelData.scene.clone();
       
-      // Scale and position the model appropriately
-      modelScene.scale.set(1, 1, 1);
-      modelScene.position.set(0, 0, 0);
+      // Scale the model to make it larger (increased from 1 to 2)
+      modelScene.scale.set(1.8, 1.8, 1.8);
+      
+      // Adjust position to center it properly
+      modelScene.position.set(0, -0.5, 0);
       
       // Add to our ref
       modelRef.current.add(modelScene);
@@ -116,11 +118,11 @@ const DeskScene: React.FC<DeskSceneProps> = ({ modelData }) => {
         position={[0, 2.5, 6]}
       />
       
-      {/* Lighting setup */}
-      <ambientLight intensity={0.4} />
+      {/* Lighting setup - enhanced for better visibility */}
+      <ambientLight intensity={0.6} /> {/* Increased intensity */}
       <directionalLight 
         position={[5, 5, 5]} 
-        intensity={0.8} 
+        intensity={1.0} 
         castShadow 
         shadow-mapSize-width={1024} 
         shadow-mapSize-height={1024} 
@@ -129,11 +131,11 @@ const DeskScene: React.FC<DeskSceneProps> = ({ modelData }) => {
         position={[-5, 8, -5]} 
         angle={0.5} 
         penumbra={0.8} 
-        intensity={1.5} 
+        intensity={1.8} 
         castShadow 
         color="#9b87f5" 
       />
-      <pointLight position={[0, 4, 0]} intensity={0.8} color="#E5DEFF" />
+      <pointLight position={[0, 4, 0]} intensity={1.0} color="#E5DEFF" />
       
       {/* Container for the loaded GLB model */}
       <group ref={modelRef} position={[0, 0, 0]} />

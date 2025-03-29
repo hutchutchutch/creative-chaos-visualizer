@@ -47,7 +47,8 @@ export const useModelLoader = (modelPath: string) => {
       (err) => {
         if (isMounted) {
           console.error('Error loading model:', err);
-          setError(err);
+          // Fix: Type error by ensuring we're setting a proper Error object
+          setError(err instanceof Error ? err : new Error(String(err)));
         }
       }
     );

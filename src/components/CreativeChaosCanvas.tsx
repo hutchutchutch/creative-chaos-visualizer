@@ -11,7 +11,7 @@ interface CreativeChaosCanvasProps {
 }
 
 const CreativeChaosCanvas: React.FC<CreativeChaosCanvasProps> = ({ 
-  modelPath = '/desk.glb' // Using the desk.glb file from the public folder
+  modelPath = '/desk2.glb' // Changed to use desk2.glb file
 }) => {
   const { model, loadingProgress, error } = useModelLoader(modelPath);
   const [showOverlay, setShowOverlay] = useState(false);
