@@ -24,6 +24,7 @@ const GameScene = () => {
     playerLane,
     setPlayerLane,
     gameSpeed,
+    setGameSpeed,
     health,
     gameActive,
     setGameActive,
@@ -43,6 +44,7 @@ const GameScene = () => {
   const { getPlayerPosition, isMoving, moveDirection } = usePlayerControls(playerLane, setPlayerLane, gameActive);
   
   // Reset functionality
+  const frameCounter = useRef(0);
   const resetFrameCounters = useCallback(() => {
     frameCounter.current = 0;
   }, []);
@@ -58,7 +60,6 @@ const GameScene = () => {
   });
   
   // Main game loop
-  const frameCounter = useRef(0);
   useFrame(() => {
     if (!gameActive) return;
     
