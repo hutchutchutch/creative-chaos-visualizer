@@ -23,6 +23,7 @@ const GameInstructionsModal: React.FC<GameInstructionsModalProps> = ({
   onStart
 }) => {
   const handleStart = () => {
+    console.log("🔍 Got it button clicked, calling onStart and onClose...");
     onStart(); // Start the game
     onClose(); // Close the modal
   };
@@ -30,6 +31,7 @@ const GameInstructionsModal: React.FC<GameInstructionsModalProps> = ({
   return (
     <Dialog open={open} onOpenChange={(isOpen) => {
       if (!isOpen) {
+        console.log("🔍 Dialog closed via X button, calling onClose and onStart...");
         onClose();
         onStart(); // Also start the game when dialog is closed using the X button
       }

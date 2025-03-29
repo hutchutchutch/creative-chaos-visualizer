@@ -27,9 +27,14 @@ export const useGameState = () => {
   const [currentHour, setCurrentHour] = useState(1);
   const [dailySchedule, setDailySchedule] = useState<string[]>(Array(16).fill(''));
 
+  // Add an effect to log when gameActive changes
+  useEffect(() => {
+    console.log("🔍 useGameState: gameActive changed to:", gameActive);
+  }, [gameActive]);
+
   // Debug info - log important game state every few seconds
   useEffect(() => {
-    console.log('GameState initialized with:', { 
+    console.log('🔍 GameState initialized with:', { 
       playerLane, 
       gameSpeed, 
       health, 

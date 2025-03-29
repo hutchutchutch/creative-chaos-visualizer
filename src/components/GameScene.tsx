@@ -37,6 +37,8 @@ const GameScene = () => {
     setHealth
   } = useGameState();
   
+  console.log("🔍 GameScene rendered, gameActive:", gameActive);
+  
   // Hour choices management
   const { hourChoices, updateHourChoices, updateFrame, setHourChoices } = useHourChoices(gameSpeed, gameActive);
   
@@ -62,20 +64,29 @@ const GameScene = () => {
   // Listen for game start event
   useEffect(() => {
     const handleGameStart = () => {
-      console.log("Game starting from event...");
+      console.log("🔍 Game-start event received in GameScene, setting gameActive to true");
+      console.log("🔍 gameActive before:", gameActive);
       setGameActive(true);
+      console.log("🔍 gameActive after setGameActive call (may not show updated value due to closure):", gameActive);
     };
     
+    console.log("🔍 Setting up game-start event listener in GameScene");
     window.addEventListener('game-start', handleGameStart);
     
     return () => {
+      console.log("🔍 Cleaning up game-start event listener in GameScene");
       window.removeEventListener('game-start', handleGameStart);
     };
-  }, [setGameActive]);
+  }, [setGameActive, gameActive]);
   
   // Main game loop
   useFrame(() => {
-    if (!gameActive) return;
+    if (!gameActive) {
+      console.log("🔍 Game loop skipped - gameActive is false");
+      return;
+    }
+    
+    console.log("🔍 Game loop running - gameActive is true");
     
     // Update camera position based on player lane
     const targetX = getPlayerPosition();

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import GameScene from '../components/GameScene';
@@ -21,7 +22,9 @@ const Game = () => {
   const navigate = useNavigate();
 
   const startGame = () => {
+    console.log("🔍 startGame called in Game.tsx, dispatching game-start event...");
     window.dispatchEvent(new CustomEvent('game-start'));
+    console.log("🔍 game-start event dispatched");
     setGameOver(false);
   };
 
@@ -64,7 +67,7 @@ const Game = () => {
     };
     
     const handleGameStart = () => {
-      console.log('Game started');
+      console.log("🔍 Game-start event received in Game.tsx");
     };
     
     window.addEventListener('score-update', handleScoreUpdate as EventListener);
